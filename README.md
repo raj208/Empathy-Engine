@@ -45,7 +45,7 @@ project/
 └─ README.md
 ```
 
-## Setup Instructions (Windows)
+## Setup Instructions
 
 ### 1) Create and activate a virtual environment
 ```powershell

@@ -29,7 +29,6 @@ class TTSRequest(BaseModel):
     text: str = Field(..., min_length=1, max_length=5000)
     voice: str | None = None
 
-    # Keep these as strings because edge-tts expects strings like "+10%" / "-20Hz" :contentReference[oaicite:1]{index=1}
     rate: str | None = None    # e.g. "+0%", "+15%", "-10%"
     pitch: str | None = None   # e.g. "+0Hz", "+30Hz", "-20Hz"
     volume: str | None = None  # e.g. "+0%", "+10%", "-5%"
@@ -99,7 +98,6 @@ from app.mapping import map_emotion, intensity_boost
 
 
 
-# Add this new request model
 class EmpathyRequest(BaseModel):
     text: str = Field(..., min_length=1, max_length=5000)
  
