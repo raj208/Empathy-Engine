@@ -44,3 +44,39 @@ project/
 │
 └─ README.md
 ```
+
+## Setup Instructions (Windows)
+
+### 1) Create and activate a virtual environment
+```powershell
+python -m venv .venv
+.\.venv\Scripts\activate
+```
+
+---
+
+
+
+### 3) Install dependencies
+```powershell
+pip install -r requirements.txt
+```
+
+---
+
+
+### 5) Run the application
+```powershell
+uvicorn app.main:app
+```
+
+The app will start at:
+```
+http://127.0.0.1:8000
+```
+
+---
+
+## Notes
+- Generated audio files are saved in the `outputs/` directory
+
