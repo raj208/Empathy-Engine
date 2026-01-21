@@ -79,7 +79,7 @@ http://127.0.0.1:8000
 
 ## User Interface
 
-<img src="images/ui.png" alt="Empathy Engine UI" width="800"/>
+<img src="img/ui.png" alt="Empathy Engine UI" width="800"/>
 
 
 ## Notes
