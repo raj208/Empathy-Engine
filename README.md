@@ -15,3 +15,32 @@ It outputs a **playable `.wav`** file and provides a simple web UI for instant d
 ✅ **WAV Output** (`riff-24khz-16bit-mono-pcm`)  
 ✅ **Caching** (same input + params returns same saved WAV)  
 ✅ **Cleanup Endpoint** to delete old generated WAV files
+
+
+## Tech Stack
+
+- **FastAPI** (API server)
+- **Edge-TTS** (Text-to-Speech engine)
+- **Hugging Face Transformers** (emotion classifier)
+- **Torch (CPU)** (for running the transformer model locally)
+- **Jinja2** (serving the demo UI)
+
+## Project Structure
+
+```
+project/
+├─ app/
+│  ├─ main.py
+│  ├─ emotion.py
+│  ├─ mapping.py
+│  ├─ cache.py
+│  ├─ tts_router.py
+│  └─ ui_router.py
+│
+├─ templates/
+│  └─ index.html
+│
+├─ outputs/        # Generated WAV files are saved here
+│
+└─ README.md
+```
