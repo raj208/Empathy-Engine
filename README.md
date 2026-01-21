@@ -85,3 +85,137 @@ http://127.0.0.1:8000
 ## Notes
 - Generated audio files are saved in the `outputs/` directory
 
+
+## Design Choices
+
+### 1) Why Edge-TTS
+
+Edge-TTS provides **high-quality neural voices for free** and supports programmatic control over:
+
+- **Rate**
+- **Pitch**
+- **Volume**
+
+---
+
+### 2) Emotion Detection Approach (Granular Emotions)
+
+Instead of limiting emotion detection to **Positive / Negative / Neutral**, we use a **pretrained transformer model** that outputs **7 emotion classes**:
+
+- joy  
+- anger  
+- sadness  
+- fear  
+- surprise  
+- disgust  
+- neutral  
+
+This finer granularity makes the system feel **more human-like** and enables **more meaningful and expressive voice modulation**.
+
+---
+
+### 3) Intensity Scaling Logic
+
+Emotion expression is not only about *which emotion* is detected, but also *how strong* it is.
+
+We compute intensity in two stages:
+
+**Base intensity**
+```
+base_intensity = model confidence score (0.0 – 1.0)
+```
+
+**Heuristic boosts**
+The base score is then adjusted using linguistic signals:
+
+- Exclamation marks (`!!!`) → increase intensity  
+- Question marks (`???`) → mild increase  
+- ALL CAPS words (`BEST`, `NOW`) → increase intensity  
+- Elongated words (`soooo`) → increase intensity  
+- Intensifiers (`very`, `extremely`, `absolutely`) → increase intensity  
+
+Finally, intensity is **clamped to `[0, 1]`** to prevent extreme outputs.
+
+**Example**
+- `"This is good."` → mild modulation  
+- `"THIS IS THE BEST NEWS EVER!!!"` → strong modulation  
+
+---
+
+### 4) Emotion → Voice Parameter Mapping
+
+Each emotion maps to a **direction of change** in speech parameters.  
+The **final values are scaled by intensity**.
+
+#### General rules
+
+- **Joy / Surprise**
+  - Faster rate
+  - Higher pitch
+  - Slightly louder volume
+
+- **Sadness**
+  - Slower rate
+  - Lower pitch
+  - Softer volume
+
+- **Anger**
+  - Faster rate
+  - Louder volume
+  - Slight pitch variation
+
+- **Fear**
+  - Higher pitch
+  - Slightly faster rate
+  - Near-neutral volume
+
+- **Neutral**
+  - No modulation
+
+#### Example (conceptual ranges)
+
+- **Joy**
+  - Rate: `+10% → +28%`
+  - Pitch: `+12Hz → +48Hz`
+  - Volume: `+4% → +14%`
+
+- **Sadness**
+  - Rate: `-8% → -22%`
+  - Pitch: `-10Hz → -40Hz`
+  - Volume: `-2% → -10%`
+
+This approach ensures:
+
+- Deterministic and explainable behavior  
+- Expressive but controlled output  
+- No unnatural or extreme voice shifts  
+
+---
+
+### 5) Caching Strategy (Performance Optimization)
+
+Generating speech repeatedly for the same input wastes time and resources.
+
+We compute a **stable cache key** based on:
+
+- Input text
+- Chosen voice parameters
+- Output format
+
+If an identical request is received again:
+
+- The previously generated `.wav` file is returned instantly
+- The response includes `cached: true`
+
+This significantly improves responsiveness and scalability.
+
+---
+
+## Limitations
+
+- Edge-TTS supports **rate, pitch, and volume** well, but advanced SSML features  
+  (e.g., `<phoneme>`, `<emphasis>`, `<break>`) are limited under the Edge-only constraint.
+- The **first request after server startup** may be slower because the transformer
+  model is loaded into memory once.
+
+---
