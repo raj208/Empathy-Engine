@@ -82,11 +82,17 @@ http://127.0.0.1:8000
 <img src="img/ui.png" alt="Empathy Engine UI" width="800"/>
 
 
-## Notes
 - Generated audio files are saved in the `outputs/` directory
 
 
 ## Design Choices
+
+This section explains the key architectural and design decisions behind the system.
+
+<p align="center">
+  <img src="images/workflow.png" alt="Empathy Engine Workflow" width="900"/>
+</p>
+
 
 ### 1) Why Edge-TTS
 
