@@ -18,7 +18,7 @@ router = APIRouter(tags=["tts"])
 OUT_DIR = Path("outputs")
 OUT_DIR.mkdir(exist_ok=True)
 
-DEFAULT_VOICE = "en-US-AriaNeural"  # English-only
+DEFAULT_VOICE = "en-US-AriaNeural"  
 # WAV/PCM (RIFF header) output format used by Microsoft TTS stacks :contentReference[oaicite:0]{index=0}
 # WAV_OUTPUT_FORMAT = "riff-24khz-16bit-mono-pcm"
 WAV_OUTPUT_FORMAT = "riff-16khz-16bit-mono-pcm"
@@ -113,7 +113,6 @@ async def empathy(req: EmpathyRequest):
 
     # out_name = f"{uuid.uuid4().hex}.wav"
     # out_path = OUT_DIR / out_name
-    # Cache filename from deterministic key
     key = cache_key(req.text, cfg, WAV_OUTPUT_FORMAT)
     out_name = f"{key[:24]}.wav"
     out_path = OUT_DIR / out_name
