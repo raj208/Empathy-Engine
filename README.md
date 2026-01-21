@@ -57,7 +57,7 @@ python -m venv .venv
 
 
 
-### 3) Install dependencies
+### 2) Install dependencies
 ```powershell
 pip install -r requirements.txt
 ```
@@ -65,7 +65,7 @@ pip install -r requirements.txt
 ---
 
 
-### 5) Run the application
+### 3) Run the application
 ```powershell
 uvicorn app.main:app
 ```
