@@ -1,0 +1,531 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Empathy Engine</title>
+
+  <style>
+    :root{
+      --bg:#f6f7fb;
+      --panel:#ffffff;
+      --border: rgba(15,23,42,.12);
+      --text:#0f172a;
+      --muted:#475569;
+      --accent:#2563eb;
+      --accentSoft: rgba(37,99,235,.10);
+      --danger:#b91c1c;
+      --dangerSoft: rgba(185,28,28,.10);
+      --ok:#15803d;
+      --okSoft: rgba(21,128,61,.10);
+      --shadow: 0 10px 24px rgba(2,6,23,.08);
+      --radius: 14px;
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      --sans: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+    }
+
+    *{ box-sizing:border-box; }
+    body{
+      margin:0;
+      font-family: var(--sans);
+      color: var(--text);
+      background:
+        radial-gradient(900px 600px at 15% -10%, rgba(37,99,235,.12), transparent 55%),
+        radial-gradient(800px 550px at 95% 10%, rgba(21,128,61,.10), transparent 55%),
+        var(--bg);
+    }
+
+    .container{
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 26px 16px 38px;
+    }
+
+    header{
+      display:flex;
+      align-items:flex-end;
+      justify-content:space-between;
+      gap: 14px;
+      margin-bottom: 14px;
+    }
+
+    h1{
+      margin:0;
+      font-size: 26px;
+      letter-spacing: -0.02em;
+    }
+
+    .sub{
+      margin: 6px 0 0;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.45;
+      max-width: 760px;
+    }
+
+    .toplinks{
+      display:flex;
+      gap: 10px;
+      flex-wrap:wrap;
+      align-items:center;
+      justify-content:flex-end;
+    }
+
+    .chip{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,.65);
+      font-size: 12px;
+      color: var(--muted);
+      user-select:none;
+      white-space:nowrap;
+    }
+
+    .dot{
+      width:8px; height:8px;
+      border-radius:999px;
+      background: #94a3b8;
+    }
+    .dot.ok{ background: var(--ok); }
+    .dot.bad{ background: var(--danger); }
+
+    .grid{
+      display:grid;
+      grid-template-columns: 1.15fr .85fr;
+      gap: 14px;
+      margin-top: 14px;
+    }
+    @media (max-width: 920px){
+      .grid{ grid-template-columns: 1fr; }
+      header{ align-items:flex-start; }
+      .toplinks{ justify-content:flex-start; }
+    }
+
+    .card{
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow:hidden;
+    }
+
+    .card-h{
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--border);
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap: 10px;
+      background: rgba(2,6,23,.02);
+    }
+
+    .card-h strong{
+      font-size: 14px;
+      letter-spacing: .01em;
+    }
+
+    .card-b{ padding: 16px; }
+
+    label{
+      display:block;
+      font-size: 12px;
+      color: var(--muted);
+      margin: 0 0 6px;
+    }
+
+    textarea{
+      width:100%;
+      min-height: 170px;
+      resize: vertical;
+      padding: 12px 12px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      background: rgba(2,6,23,.02);
+      font-size: 15px;
+      line-height: 1.45;
+      outline: none;
+    }
+    textarea:focus{
+      border-color: rgba(37,99,235,.45);
+      box-shadow: 0 0 0 3px rgba(37,99,235,.12);
+    }
+
+    .row{
+      display:flex;
+      gap: 10px;
+      flex-wrap:wrap;
+      align-items:center;
+    }
+    .row.spread{ justify-content: space-between; }
+
+    button{
+      padding: 10px 12px;
+      border-radius: 12px;
+      border: 1px solid rgba(37,99,235,.30);
+      background: linear-gradient(180deg, rgba(37,99,235,.14), rgba(37,99,235,.08));
+      font-size: 14px;
+      font-weight: 700;
+      cursor:pointer;
+    }
+    button:hover{ filter: brightness(1.03); }
+    button:active{ transform: translateY(1px); }
+    button:disabled{
+      opacity:.6;
+      cursor:not-allowed;
+      transform:none;
+    }
+
+    .btn-ghost{
+      border: 1px solid var(--border);
+      background: transparent;
+      color: var(--muted);
+      font-weight: 700;
+    }
+
+    .examples button{
+      border-style: dashed;
+      border-color: var(--border);
+      background: transparent;
+      color: var(--muted);
+      font-weight: 700;
+      padding: 8px 10px;
+    }
+
+    .status{
+      display:flex;
+      align-items:center;
+      gap: 10px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .spinner{
+      width:14px; height:14px;
+      border-radius:999px;
+      border: 2px solid rgba(15,23,42,.18);
+      border-top-color: rgba(37,99,235,.85);
+      animation: spin 1s linear infinite;
+      display:none;
+    }
+    .spinner.on{ display:inline-block; }
+    @keyframes spin{ to { transform: rotate(360deg); } }
+
+    .error{
+      margin-top: 10px;
+      border: 1px solid rgba(185,28,28,.28);
+      background: var(--dangerSoft);
+      padding: 10px 12px;
+      border-radius: 12px;
+      color: var(--danger);
+      font-size: 13px;
+      white-space: pre-wrap;
+      display:none;
+    }
+    .error.on{ display:block; }
+
+    .kvs{
+      display:grid;
+      grid-template-columns: 140px 1fr;
+      gap: 8px 10px;
+      align-items:center;
+      margin-top: 10px;
+    }
+    .k{ color: var(--muted); font-size: 12px; }
+    .v{
+      font-family: var(--mono);
+      font-size: 13px;
+      word-break: break-word;
+    }
+
+    .badge{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,.7);
+      font-size: 12px;
+      color: var(--muted);
+      user-select:none;
+    }
+
+    .badge strong{ color: var(--text); }
+
+    .cached{
+      display:none;
+      border: 1px solid rgba(21,128,61,.25);
+      background: var(--okSoft);
+      color: var(--ok);
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      align-items:center;
+      gap:8px;
+    }
+    .cached.on{ display:inline-flex; }
+
+    audio{
+      width:100%;
+      margin-top: 10px;
+      border-radius: 12px;
+      outline:none;
+    }
+
+    .footer{
+      display:flex;
+      gap: 10px;
+      flex-wrap:wrap;
+      justify-content:space-between;
+      margin-top: 12px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    a{ color: var(--accent); text-decoration:none; }
+    a:hover{ text-decoration:underline; }
+
+    .mutedline{
+      color: var(--muted);
+      font-size: 12px;
+      margin-top: 8px;
+      display:flex;
+      justify-content:space-between;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <header>
+      <div>
+        <h1>Empathy Engine</h1>
+        <!-- <p class="sub">Type text → detect emotion → modulate voice (rate/pitch/volume) → generate a WAV file.</p> -->
+      </div>
+      <div class="toplinks">
+        <span class="chip"><span id="apiDot" class="dot"></span><span id="apiText">Checking API…</span></span>
+        <a class="chip" href="/docs" target="_blank" rel="noreferrer">Open Swagger</a>
+      </div>
+    </header>
+
+    <div class="grid">
+      <!-- INPUT -->
+      <section class="card">
+        <div class="card-h">
+          <strong>Input</strong>
+          <div class="status">
+            <span id="spinner" class="spinner"></span>
+            <span id="status">Ready</span>
+          </div>
+        </div>
+        <div class="card-b">
+          <label for="text">Text</label>
+          <textarea id="text" placeholder="Paste or type something…"></textarea>
+
+          <div class="mutedline">
+            <span id="charCount">0 characters</span>
+            <span class="chip" title="Works best with expressive punctuation / emphasis">Tip: try “!!!”, ALL CAPS, “extremely”</span>
+          </div>
+
+          <div style="height:10px"></div>
+          
+
+          <div class="row spread">
+            <div class="row examples">
+              <button type="button" onclick="setExample(1)">Joy</button>
+              <button type="button" onclick="setExample(2)">Anger</button>
+              <button type="button" onclick="setExample(3)">Sad</button>
+              <button type="button" onclick="setExample(4)">Neutral</button>
+            </div>
+
+            <div class="row">
+              <button id="gen">Generate</button>
+              <button id="clear" class="btn-ghost" type="button">Clear</button>
+            </div>
+          </div>
+
+          <div id="error" class="error"></div>
+        </div>
+      </section>
+
+      <!-- OUTPUT -->
+      <aside class="card">
+        <div class="card-h">
+          <strong>Output</strong>
+          <span id="cached" class="cached"><span class="dot ok"></span> Cached</span>
+        </div>
+        <div class="card-b">
+          <div class="row" style="gap:10px; flex-wrap:wrap;">
+            <span class="badge">Emotion: <strong id="emoLabel">—</strong></span>
+            <span class="badge">Score: <strong id="emoScore">—</strong></span>
+            <span class="badge">Intensity: <strong id="emoIntensity">—</strong></span>
+          </div>
+
+          <div style="height:10px"></div>
+
+          <strong style="font-size:14px;">Voice parameters</strong>
+          <div class="kvs">
+            <div class="k">Voice</div><div class="v" id="vVoice">—</div>
+            <div class="k">Rate</div><div class="v" id="vRate">—</div>
+            <div class="k">Pitch</div><div class="v" id="vPitch">—</div>
+            <div class="k">Volume</div><div class="v" id="vVolume">—</div>
+          </div>
+
+          <audio id="player" controls style="display:none;"></audio>
+
+          <div class="footer">
+            <span>Endpoint: <span class="badge" style="padding:3px 10px;">POST /empathy</span></span>
+            <span><a href="/health" target="_blank" rel="noreferrer">Health</a></span>
+          </div>
+        </div>
+      </aside>
+    </div>
+  </div>
+
+  <script>
+    const $ = (id) => document.getElementById(id);
+
+    function setStatus(msg, loading=false) {
+      $("status").textContent = msg;
+      $("spinner").classList.toggle("on", !!loading);
+    }
+
+    function setError(msg) {
+      const box = $("error");
+      if (!msg) {
+        box.textContent = "";
+        box.classList.remove("on");
+        return;
+      }
+      box.textContent = msg;
+      box.classList.add("on");
+    }
+
+    function setCached(on) {
+      $("cached").classList.toggle("on", !!on);
+    }
+
+    function safeFixed(x) {
+      if (typeof x !== "number" || !isFinite(x)) return "—";
+      return x.toFixed(4);
+    }
+
+    function setExample(n) {
+      const ex = {
+        1: "This is the BEST news ever!!! I'm so excited and grateful!",
+        2: "This is extremely frustrating. I have been waiting for hours and nothing is working!",
+        3: "I feel really disappointed. This outcome makes me sad.",
+        4: "Thanks. Please share the next steps and the expected timeline."
+      };
+      $("text").value = ex[n] || "";
+      updateCharCount();
+      setError("");
+    }
+
+    function updateCharCount() {
+      const n = ($("text").value || "").length;
+      $("charCount").textContent = `${n} character${n === 1 ? "" : "s"}`;
+    }
+
+    async function checkHealth() {
+      const dot = $("apiDot");
+      const txt = $("apiText");
+      try {
+        const res = await fetch("/health");
+        if (!res.ok) throw new Error("bad status");
+        dot.className = "dot ok";
+        txt.textContent = "API online";
+      } catch {
+        dot.className = "dot bad";
+        txt.textContent = "API offline";
+      }
+    }
+
+    async function generate() {
+      const text = $("text").value.trim();
+      if (!text) { setError("Please enter some text."); return; }
+
+      $("gen").disabled = true;
+      $("clear").disabled = true;
+      setError("");
+      setCached(false);
+      setStatus("Generating…", true);
+
+      try {
+        const res = await fetch("/empathy", {
+          method: "POST",
+          headers: {"Content-Type":"application/json"},
+          body: JSON.stringify({ text })
+        });
+
+        const data = await res.json();
+        if (!res.ok) throw new Error(data?.detail || "Request failed");
+
+        $("emoLabel").textContent = data?.emotion?.label ?? "—";
+        $("emoScore").textContent = safeFixed(data?.emotion?.score);
+        $("emoIntensity").textContent = safeFixed(data?.emotion?.intensity);
+
+        $("vVoice").textContent = data?.voice_params?.voice ?? "—";
+        $("vRate").textContent = data?.voice_params?.rate ?? "—";
+        $("vPitch").textContent = data?.voice_params?.pitch ?? "—";
+        $("vVolume").textContent = data?.voice_params?.volume ?? "—";
+
+        setCached(!!data?.cached);
+
+        if (!data?.audio_url) throw new Error("No audio_url returned by server.");
+
+        const url = data.audio_url + "?t=" + Date.now();
+        const player = $("player");
+        player.src = url;
+        player.style.display = "block";
+        await player.play().catch(() => {});
+        setStatus("Done");
+      } catch (e) {
+        setStatus("Error");
+        setError(String(e));
+      } finally {
+        $("gen").disabled = false;
+        $("clear").disabled = false;
+        setStatus($("status").textContent, false);
+      }
+    }
+
+    function clearAll() {
+      $("text").value = "";
+      updateCharCount();
+      setError("");
+      setCached(false);
+      setStatus("Ready", false);
+
+      $("emoLabel").textContent = "—";
+      $("emoScore").textContent = "—";
+      $("emoIntensity").textContent = "—";
+      $("vVoice").textContent = "—";
+      $("vRate").textContent = "—";
+      $("vPitch").textContent = "—";
+      $("vVolume").textContent = "—";
+
+      const player = $("player");
+      player.pause();
+      player.removeAttribute("src");
+      player.load();
+      player.style.display = "none";
+    }
+
+    $("gen").addEventListener("click", generate);
+    $("clear").addEventListener("click", clearAll);
+    $("text").addEventListener("input", updateCharCount);
+
+    window.addEventListener("load", async () => {
+      updateCharCount();
+      await checkHealth();
+    });
+  </script>
+</body>
+</html>
