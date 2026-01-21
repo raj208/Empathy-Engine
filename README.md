@@ -90,7 +90,7 @@ http://127.0.0.1:8000
 This section explains the key architectural and design decisions behind the system.
 
 <p align="center">
-  <img src="images/workflow.png" alt="Empathy Engine Workflow" width="900"/>
+  <img src="imgs/workflow.png" alt="Empathy Engine Workflow" width="900"/>
 </p>
 
 
